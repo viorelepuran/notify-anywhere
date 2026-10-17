@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Notify Anywhere</title>
+        <item>
+            <title>1.0.0</title>
+            <pubDate>Sat, 17 Oct 2026 13:04:57 +0300</pubDate>
+            <link>https://github.com/viorelepuran/notify-anywhere</link>
+            <sparkle:version>1</sparkle:version>
+            <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/viorelepuran/notify-anywhere/releases/download/v1.0.0/NotifyAnywhere-1.0.0.dmg" sparkle:edSignature="5qCE95yDaRLUBKnCj333nz78cg9HpZ56aXgHDvD54XGzqCMPzLGFgUbmRKshbxGG+NN1w2pYRh4XWvn8gDS5DQ==" length="1935946" type="application/octet-stream"/>
+        </item>
+    </channel>
+</rss>
