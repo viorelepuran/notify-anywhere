@@ -40,11 +40,19 @@ macOS always shows notification banners in the top-right corner, and there's no 
 
 Releases are signed with a Developer ID and notarized by Apple, so they open without security warnings.
 
-**Requirements:** macOS 14 Sonoma or later, on Apple silicon or Intel.
+**Requirements:** macOS 14 Sonoma or later, on Apple silicon or Intel. So far it has only been tested on macOS 27 (see below).
+
+| macOS | Status |
+|---|---|
+| 27 | Tested |
+| 26 Tahoe | Should work, not tested yet: other open-source banner movers document the same window layout on 26.4–26.6 |
+| 14 Sonoma, 15 Sequoia | Should work, not tested yet: built for the per-banner window layout these versions use |
+
+If you run it on a version that isn't marked as tested, a quick note in an [issue](https://github.com/viorelepuran/notify-anywhere/issues) saying whether it works would help a lot.
 
 ## How it works
 
-Notification banners are drawn inside a window owned by macOS's Notification Center process. Notify Anywhere uses the public Accessibility API to find the banners in that window and shift the window so the banners land at your chosen spot. It reads only positions and sizes. Notification content is never stored or sent anywhere.
+Notification banners are drawn inside windows owned by macOS's Notification Center process: one screen-sized window holding every banner on macOS 26 and later, and a window per banner on earlier versions. Notify Anywhere uses the public Accessibility API to find the banners in those windows and shift the windows so the banners land at your chosen spot. Desktop widgets and the Notification Center panel are left alone. It reads only positions and sizes. Notification content is never stored or sent anywhere.
 
 Because it relies on how macOS lays out that window, a future macOS update could change things. If it stops working, please [open an issue](https://github.com/viorelepuran/notify-anywhere/issues).
 
