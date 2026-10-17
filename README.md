@@ -38,10 +38,7 @@ macOS always shows notification banners in the top-right corner, and there's no 
 2. Open it and drag **Notify Anywhere** into **Applications**.
 3. Launch it and follow the short setup. macOS will ask you to allow **Accessibility** access, which the app needs to move the banner window.
 
-> **"Apple could not verify…" warning?** Current builds aren't notarized by Apple yet. Open **System Settings → Privacy & Security**, scroll down and click **Open Anyway** next to Notify Anywhere. Or run:
-> ```bash
-> xattr -dr com.apple.quarantine "/Applications/Notify Anywhere.app"
-> ```
+Releases are signed with a Developer ID and notarized by Apple, so they open without security warnings.
 
 **Requirements:** macOS 14 Sonoma or later, on Apple silicon or Intel.
 
