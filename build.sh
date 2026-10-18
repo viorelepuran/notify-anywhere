@@ -7,8 +7,15 @@ NAME="Notify Anywhere"
 EXEC="NotifyAnywhere"
 APP="build/$NAME.app"
 rm -rf "$APP"
-mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" "$APP/Contents/Frameworks"
 cp Info.plist "$APP/Contents/Info.plist"
+
+# Sparkle (auto-updates): pinned release, downloaded once into ./Vendor
+Tools/fetch-sparkle.sh
+ditto Vendor/Sparkle/Sparkle.framework "$APP/Contents/Frameworks/Sparkle.framework"
+# The XPC services are only needed by sandboxed apps; Notify Anywhere isn't sandboxed.
+rm -rf "$APP/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices" \
+       "$APP/Contents/Frameworks/Sparkle.framework/XPCServices"
 
 # App icon (.icns) from the 1024px master
 if [[ ! -f build/AppIcon.icns || Resources/AppIcon-1024.png -nt build/AppIcon.icns ]]; then
@@ -25,15 +32,24 @@ cp build/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 cp Resources/LiftoffLogo.png "$APP/Contents/Resources/"
 
 for ARCH in arm64 x86_64; do
-  swiftc -O -swift-version 5 -target $ARCH-apple-macos14.0 -o build/$EXEC-$ARCH Sources/*.swift
+  swiftc -O -swift-version 5 -target $ARCH-apple-macos14.0 -o build/$EXEC-$ARCH \
+    -F Vendor/Sparkle -framework Sparkle -Xlinker -rpath -Xlinker @executable_path/../Frameworks \
+    Sources/*.swift
 done
 lipo -create build/$EXEC-arm64 build/$EXEC-x86_64 -output "$APP/Contents/MacOS/$EXEC"
 rm build/$EXEC-arm64 build/$EXEC-x86_64
 
 # Signing: SIGN_IDENTITY env var wins (use your "Developer ID Application" cert for distribution),
 # then an Apple Development cert (keeps the Accessibility grant across rebuilds), then ad-hoc.
+# release.sh sets CODESIGN_TIMESTAMP=--timestamp, which notarization requires.
 IDENTITY=${SIGN_IDENTITY:-$(security find-identity -v -p codesigning | awk '/Developer ID Application/ {print $2; exit}')}
 IDENTITY=${IDENTITY:-$(security find-identity -v -p codesigning | awk '/Apple Development/ {print $2; exit}')}
-codesign --force --options runtime --timestamp=none --sign "${IDENTITY:--}" "$APP"
+sign() { codesign --force --options runtime ${CODESIGN_TIMESTAMP:---timestamp=none} --sign "${IDENTITY:--}" "$@"; }
+# Inside-out: Sparkle's helpers, then the framework, then the app.
+SPARKLE="$APP/Contents/Frameworks/Sparkle.framework"
+sign "$SPARKLE/Versions/B/Autoupdate"
+sign "$SPARKLE/Versions/B/Updater.app"
+sign "$SPARKLE"
+sign "$APP"
 
 echo "Built: $APP"

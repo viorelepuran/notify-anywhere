@@ -116,6 +116,7 @@ private struct PaneHeader: View {
 private struct GeneralPane: View {
     @ObservedObject var settings = AppSettings.shared
     @ObservedObject var permission = PermissionMonitor.shared
+    @ObservedObject var updates = UpdateController.shared
     @State private var loginError: String?
 
     var body: some View {
@@ -158,6 +159,20 @@ private struct GeneralPane: View {
                     Text("If you hide the menu bar icon, open \(Brand.appName) again from your Applications folder to bring back this window.")
                         .font(.system(size: 11)).foregroundStyle(.secondary)
                 }
+
+                Section {
+                    Toggle("Automatically check for updates", isOn: $updates.automaticallyChecksForUpdates)
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Check for updates")
+                            Text(updates.lastCheck.map { "Last checked \($0.formatted(.relative(presentation: .named)))." } ?? "Not checked yet.")
+                                .font(.system(size: 11)).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Button("Check Now") { updates.checkForUpdates() }
+                            .disabled(!updates.canCheckForUpdates)
+                    }
+                } header: { Text("Updates") }
 
                 Section {
                     HStack {
@@ -278,7 +293,7 @@ private struct AboutPane: View {
             .foregroundStyle(Brand.lavender)
             .padding(.top, 18)
 
-            Label("Runs entirely on your Mac. No accounts, no tracking, no network connections.", systemImage: "lock.shield")
+            Label("Runs entirely on your Mac. No accounts, no tracking. Update checks are its only network access.", systemImage: "lock.shield")
                 .font(.system(size: 11)).foregroundStyle(.secondary)
                 .padding(.top, 22)
             Spacer()

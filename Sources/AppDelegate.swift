@@ -13,6 +13,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
     private var cancellables = Set<AnyCancellable>()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        _ = UpdateController.shared // starts Sparkle's scheduled update checks
+
         settings.$showMenuBarIcon
             .sink { [weak self] show in self?.setStatusItemVisible(show) }
             .store(in: &cancellables)
@@ -99,6 +101,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         menu.addItem(item("Send Test Notification", #selector(sendTest), key: "t"))
         menu.addItem(.separator())
         menu.addItem(item("Settings…", #selector(openSettings), key: ","))
+        menu.addItem(item("Check for Updates…", #selector(checkForUpdates)))
         menu.addItem(item("About \(Brand.appName)", #selector(openAbout)))
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Quit \(Brand.appName)", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
@@ -116,6 +119,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
     @objc private func grantAccess() { permission.request() }
     @objc private func openSettings() { showSettings(.general) }
     @objc private func openAbout() { showSettings(.about) }
+    @objc private func checkForUpdates() { UpdateController.shared.checkForUpdates() }
 
     @objc private func placeOnScreen() {
         picker.show(current: settings.placement, margin: CGFloat(settings.margin)) { [weak self] placement in

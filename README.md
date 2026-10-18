@@ -24,7 +24,7 @@ macOS always shows notification banners in the top-right corner, and there's no 
 - **Adjustable edge spacing** from 0 to 120 pt.
 - **Instant**: banners are repositioned the moment they appear.
 - **Doesn't get in the way**: the full Notification Center panel (opened from the clock) stays where macOS puts it.
-- **Private**: runs entirely on your Mac. No accounts, no analytics, no network connections.
+- **Private**: runs entirely on your Mac. No accounts, no analytics. Its only network access is checking for updates, which you can turn off in Settings.
 - Launch at login, hideable menu bar icon, one-click test notification.
 
 <p align="center">
@@ -69,7 +69,7 @@ cd notify-anywhere
 ./release.sh        # → build/NotifyAnywhere-<version>.dmg
 ```
 
-`build.sh` signs with a Developer ID or Apple Development certificate if you have one (so the Accessibility permission survives rebuilds) and falls back to ad-hoc signing otherwise. `release.sh` can also notarize. See the comments at the top of the script.
+`build.sh` signs with a Developer ID or Apple Development certificate if you have one (so the Accessibility permission survives rebuilds) and falls back to ad-hoc signing otherwise. On first run `build.sh` downloads a pinned [Sparkle](https://sparkle-project.org) release into `Vendor/` for automatic updates. `release.sh` can also notarize and, for notarized builds, EdDSA-signs the DMG and adds it to `appcast.xml` (the update feed). See the comments at the top of the script.
 
 | Path | What's inside |
 |---|---|
@@ -77,7 +77,10 @@ cd notify-anywhere
 | `Sources/Placement.swift` | Placement math (presets, fractions, margins) |
 | `Sources/SettingsView.swift`, `OnboardingView.swift`, `ScreenPreview.swift` | SwiftUI interface |
 | `Sources/Brand.swift` | Name, links and brand colors |
+| `Sources/Updater.swift` | Sparkle update checks |
 | `Tools/MakeIcon.swift` | Renders the app icon |
+| `Tools/fetch-sparkle.sh` | Downloads the pinned Sparkle release |
+| `appcast.xml` | Sparkle update feed, updated by `release.sh` |
 
 ## License
 
